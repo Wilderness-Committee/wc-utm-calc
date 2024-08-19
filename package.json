@@ -1,7 +1,7 @@
 {
   "name": "utm-calc",
   "version": "0.1.0",
-  "homepage": "https://Wilderness-Committee.github.io/wc-utm-calc",
+  "homepage": "https://wilderness-committee.github.io/wc-utm-calc",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d .next"
   },
   "dependencies": {
     "next": "14.2.5",
