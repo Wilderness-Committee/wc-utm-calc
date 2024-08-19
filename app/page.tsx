@@ -67,7 +67,7 @@ export default function Home() {
             type="text"
             value={utmId}
             onChange={(e) => setUtmId(e.target.value)}
-            placeholder="utm1234"
+            placeholder="701OL000009lpgEYAQ"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
           />
         </div>
@@ -79,7 +79,7 @@ export default function Home() {
             type="text"
             value={tbzId}
             onChange={(e) => setTbzId(e.target.value)}
-            placeholder="tbz5678"
+            placeholder="701OL00000Fn1WzYAJ"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
           />
         </div>
