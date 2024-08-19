@@ -6,12 +6,12 @@ export default function Home() {
   const [protocol, setProtocol] = useState("https://");
   const [baseUrl, setBaseUrl] = useState("");
   const [utmId, setUtmId] = useState("");
+  const [tbzId, setTbzId] = useState("");
   const [utmSource, setUtmSource] = useState("");
   const [utmMedium, setUtmMedium] = useState("");
   const [utmCampaign, setUtmCampaign] = useState("");
   const [utmTerm, setUtmTerm] = useState("");
   const [utmContent, setUtmContent] = useState("");
-  const [tbzId, setTbzId] = useState("");
   const [generatedUrl, setGeneratedUrl] = useState("");
 
   const generateUtmUrl = () => {
@@ -61,13 +61,25 @@ export default function Home() {
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
-            UTM ID
+            OTG Campaign ID
           </label>
           <input
             type="text"
             value={utmId}
             onChange={(e) => setUtmId(e.target.value)}
             placeholder="utm1234"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-white-700">
+            TBZ Campaign ID
+          </label>
+          <input
+            type="text"
+            value={tbzId}
+            onChange={(e) => setTbzId(e.target.value)}
+            placeholder="tbz5678"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
           />
         </div>
@@ -130,18 +142,6 @@ export default function Home() {
             value={utmContent}
             onChange={(e) => setUtmContent(e.target.value)}
             placeholder="ad_banner, link"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-white-700">
-            TBZ ID
-          </label>
-          <input
-            type="text"
-            value={tbzId}
-            onChange={(e) => setTbzId(e.target.value)}
-            placeholder="tbz5678"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
           />
         </div>
