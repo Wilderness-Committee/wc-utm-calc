@@ -4,7 +4,7 @@ This is a simple UTM Link Generator web app built with Next.js and Tailwind CSS.
 
 ## Use UTM Link Generator
 
-You can use the UTM Link Generator by visiting [this link](https://wilderness-committee.github.io/wc-utm-calc/).
+You can use the UTM Link Generator without installing by visiting [this link](https://wilderness-committee.github.io/wc-utm-calc/).
 
 ## Features
 
