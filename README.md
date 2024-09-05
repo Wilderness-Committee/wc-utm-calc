@@ -2,7 +2,7 @@
 
 This is a simple UTM Link Generator web app built with Next.js and Tailwind CSS. The app allows you to generate UTM links easily by filling out a form with relevant campaign parameters.
 
-## Live Demo
+## Use UTM Link Generator
 
 You can use the UTM Link Generator by visiting [this link](https://wilderness-committee.github.io/wc-utm-calc/).
 
