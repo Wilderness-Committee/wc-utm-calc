@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export default function Home() {
   const [protocol, setProtocol] = useState("https://");
-  const [baseUrl, setBaseUrl] = useState("");
+  const [baseUrl, setBaseUrl] = useState("wildernesscommittee.org/donate"); // Pre-populated with default URL
   const [utmId, setUtmId] = useState("");
   const [tbzId, setTbzId] = useState("");
   const [utmSource, setUtmSource] = useState("");
@@ -55,7 +55,7 @@ export default function Home() {
             type="text"
             value={baseUrl}
             onChange={(e) => setBaseUrl(e.target.value)}
-            placeholder="wildernesscommittee.org"
+            placeholder="wildernesscommittee.org/donate"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
             required
           />
@@ -94,7 +94,7 @@ export default function Home() {
             type="text"
             value={utmSource}
             onChange={(e) => setUtmSource(e.target.value)}
-            placeholder="google, newsletter"
+            placeholder="aa, dc, og_ej"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
             required
           />
@@ -107,7 +107,7 @@ export default function Home() {
             type="text"
             value={utmMedium}
             onChange={(e) => setUtmMedium(e.target.value)}
-            placeholder="cpc, email"
+            placeholder="email, social"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
             required
           />
