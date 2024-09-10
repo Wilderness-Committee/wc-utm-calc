@@ -63,7 +63,6 @@ export default function Home() {
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
             OTG Campaign ID
-            <span className="text-gray-500 text-xs ml-1">(optional)</span>
           </label>
           <input
             type="text"
@@ -71,12 +70,12 @@ export default function Home() {
             onChange={(e) => setUtmId(e.target.value)}
             placeholder="701OL000009lpgEYAQ"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
+            required
           />
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
             TBZ Campaign ID
-            <span className="text-gray-500 text-xs ml-1">(optional)</span>
           </label>
           <input
             type="text"
@@ -84,7 +83,8 @@ export default function Home() {
             onChange={(e) => setTbzId(e.target.value)}
             placeholder="701OL00000Fn1WzYAJ"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
-          />
+            required          
+/>
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
@@ -115,7 +115,6 @@ export default function Home() {
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
             UTM Campaign Name <span className="text-red-500">*</span>
-            <span className="text-gray-500 text-xs ml-1">(optional)</span>
           </label>
           <input
             type="text"
@@ -123,6 +122,7 @@ export default function Home() {
             onChange={(e) => setUtmCampaign(e.target.value)}
             placeholder="spring_sale"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
+            required
           />
         </div>
         <div className="mb-4">
@@ -134,7 +134,7 @@ export default function Home() {
             type="text"
             value={utmTerm}
             onChange={(e) => setUtmTerm(e.target.value)}
-            placeholder="shoes, running"
+            placeholder="fraking, environment"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
           />
         </div>
@@ -147,7 +147,7 @@ export default function Home() {
             type="text"
             value={utmContent}
             onChange={(e) => setUtmContent(e.target.value)}
-            placeholder="ad_banner, link"
+            placeholder="ad_banner, email_link"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
           />
         </div>
