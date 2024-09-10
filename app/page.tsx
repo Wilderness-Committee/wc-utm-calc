@@ -120,7 +120,7 @@ export default function Home() {
             type="text"
             value={utmCampaign}
             onChange={(e) => setUtmCampaign(e.target.value)}
-            placeholder="spring_sale"
+            placeholder="spotted_owl, say_no_to_fracking"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
             required
           />
