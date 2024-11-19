@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export default function Home() {
   const [protocol, setProtocol] = useState("https://");
-  const [baseUrl, setBaseUrl] = useState("wildernesscommittee.org/donate"); // Pre-populated with default URL
+  const [baseUrl, setBaseUrl] = useState("wildernesscommittee.org/donate");
   const [utmId, setUtmId] = useState("");
   const [tbzId, setTbzId] = useState("");
   const [utmSource, setUtmSource] = useState("");
@@ -13,6 +13,7 @@ export default function Home() {
   const [utmTerm, setUtmTerm] = useState("");
   const [utmContent, setUtmContent] = useState("");
   const [generatedUrl, setGeneratedUrl] = useState("");
+  const [isOtherSource, setIsOtherSource] = useState(false);
 
   const generateUtmUrl = () => {
     const fullUrl = `${protocol}${baseUrl}`;
@@ -62,7 +63,7 @@ export default function Home() {
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
-            OTG Campaign ID  <span className="text-red-500">*</span>
+            OTG Campaign ID <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -75,7 +76,7 @@ export default function Home() {
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
-            TBZ Campaign ID  <span className="text-red-500">*</span>
+            TBZ Campaign ID <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -83,21 +84,50 @@ export default function Home() {
             onChange={(e) => setTbzId(e.target.value)}
             placeholder="701OL00000Fn1WzYAJ"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
-            required          
-/>
+            required
+          />
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
             UTM Source <span className="text-red-500">*</span>
           </label>
-          <input
-            type="text"
-            value={utmSource}
-            onChange={(e) => setUtmSource(e.target.value)}
-            placeholder="aa, dc, og_ej"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
-            required
-          />
+          <select
+            value={isOtherSource ? "Other" : utmSource}
+            onChange={(e) => {
+              if (e.target.value === "Other") {
+                setIsOtherSource(true);
+                setUtmSource(""); // Reset UTM Source for manual entry
+              } else {
+                setIsOtherSource(false);
+                setUtmSource(e.target.value);
+              }
+            }}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
+          >
+            <option value="">Select a source</option>
+            <option value="action_alert">Action Alert</option>
+            <option value="donor_comms">Donor Comms</option>
+            <option value="impact_report">Impact Report</option>
+            <option value="end_of_year">End Of Year</option>
+            <option value="fracking_ej">Fracking Engagement Journey</option>
+            <option value="old_growth_ej">Old Growth Engagement Journey</option>
+            <option value="action_welcome_ej">
+              Action Welcome Engagement Journey
+            </option>
+            <option value="donor_welcome_ej">
+              Donor Welcome Engagement Journey
+            </option>
+            <option value="Other">Other</option>
+          </select>
+          {isOtherSource && (
+            <input
+              type="text"
+              value={utmSource}
+              onChange={(e) => setUtmSource(e.target.value)}
+              placeholder="spotted_owl_ej, example_source_ej"
+              className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
+            />
+          )}
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
