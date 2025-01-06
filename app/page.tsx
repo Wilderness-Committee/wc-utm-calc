@@ -15,18 +15,20 @@ export default function Home() {
   const [generatedUrl, setGeneratedUrl] = useState("");
   const [isOtherHandle, setIsOtherHandle] = useState(false);
   const [isOtherSource, setIsOtherSource] = useState(false);
-
-  // Indicates if the user selected "other socials" or "other" for utmMedium
   const [isManualMedium, setIsManualMedium] = useState(false);
 
-  // Validate form state
+  // The auto-populate IDs for Action Alert
+  const otgActionAlertID = "701Am0000009AAGIA2";
+  const tbzActionAlertID = "701OL000002fbgqYAA";
+
+  // Derived state for form validation
   const isFormValid = useMemo(() => {
     // Check if URL Handle is valid
     const hasValidHandle = isOtherHandle
       ? customHandle.trim() !== ""
       : baseUrlHandle.trim() !== "";
 
-    // Required: utmId, tbzId, utmSource, utmMedium, utmCampaign must be non-empty
+    // Required: utmId, tbzId, utmSource, utmMedium, utmCampaign
     return (
       hasValidHandle &&
       utmId.trim() !== "" &&
@@ -66,6 +68,35 @@ export default function Home() {
   const copyToClipboard = () => {
     if (generatedUrl) {
       navigator.clipboard.writeText(generatedUrl);
+    }
+  };
+
+  // Handle UTM Source changes
+  const handleUtmSourceChange = (e) => {
+    const newSource = e.target.value;
+
+    // If the user selected "Other"
+    if (newSource === "Other") {
+      setIsOtherSource(true);
+      setUtmSource(""); // Clear the displayed source
+      // Clear IDs, since we won't auto-populate in this case
+      setUtmId("");
+      setTbzId("");
+      return;
+    }
+
+    // Otherwise, a standard source
+    setIsOtherSource(false);
+    setUtmSource(newSource);
+
+    // Auto-populate if it's "action_alert"
+    if (newSource === "action_alert") {
+      setUtmId(otgActionAlertID);
+      setTbzId(tbzActionAlertID);
+    } else {
+      // For clarity, clear IDs if changing away from "action_alert"
+      setUtmId("");
+      setTbzId("");
     }
   };
 
@@ -110,36 +141,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* OTG Campaign ID */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-white-700">
-            OTG Campaign ID <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={utmId}
-            onChange={(e) => setUtmId(e.target.value)}
-            placeholder="701OL000009lpgEYAQ"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
-            required
-          />
-        </div>
-
-        {/* TBZ Campaign ID */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-white-700">
-            TBZ Campaign ID <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={tbzId}
-            onChange={(e) => setTbzId(e.target.value)}
-            placeholder="701OL00000Fn1WzYAJ"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
-            required
-          />
-        </div>
-
         {/* UTM Source */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
@@ -147,15 +148,7 @@ export default function Home() {
           </label>
           <select
             value={isOtherSource ? "Other" : utmSource}
-            onChange={(e) => {
-              if (e.target.value === "Other") {
-                setIsOtherSource(true);
-                setUtmSource("");
-              } else {
-                setIsOtherSource(false);
-                setUtmSource(e.target.value);
-              }
-            }}
+            onChange={handleUtmSourceChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
           >
             <option value="" disabled hidden>
@@ -208,13 +201,13 @@ export default function Home() {
             <option value="" disabled hidden>
               Select a medium
             </option>
-            <option value="email">email</option>
-            <option value="journey">journey</option>
-            <option value="blog">blog</option>
-            <option value="facebook">facebook</option>
-            <option value="instagram">instagram</option>
-            <option value="other socials">other socials</option>
-            <option value="other">other</option>
+            <option value="email">Email</option>
+            <option value="journey">Journey</option>
+            <option value="blog">Blog</option>
+            <option value="facebook">Facebook</option>
+            <option value="instagram">Instagram</option>
+            <option value="other socials">Other Socials</option>
+            <option value="other">Other</option>
           </select>
           {isManualMedium && (
             <input
@@ -225,6 +218,36 @@ export default function Home() {
               className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
             />
           )}
+        </div>
+
+        {/* OTG Campaign ID */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-white-700">
+            OTG Campaign ID <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={utmId}
+            onChange={(e) => setUtmId(e.target.value)}
+            placeholder="701OL000009lpgEYAQ"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
+            required
+          />
+        </div>
+
+        {/* TBZ Campaign ID */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-white-700">
+            TBZ Campaign ID <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={tbzId}
+            onChange={(e) => setTbzId(e.target.value)}
+            placeholder="701OL00000Fn1WzYAJ"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
+            required
+          />
         </div>
 
         {/* UTM Campaign */}
@@ -292,6 +315,7 @@ export default function Home() {
               Generated URL
             </h2>
             <p className="break-all text-blue-600">{generatedUrl}</p>
+            <div className="flex justify-center items-center">
             <button
               type="button"
               onClick={copyToClipboard}
@@ -299,6 +323,7 @@ export default function Home() {
             >
               Copy
             </button>
+            </div>
           </div>
         )}
       </div>
