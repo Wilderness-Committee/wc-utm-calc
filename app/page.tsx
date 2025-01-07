@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import React from "react";
 
 export default function Home() {
-  const [baseUrlHandle, setBaseUrlHandle] = useState("DonateWildlife");
+  const [baseUrlHandle, setBaseUrlHandle] = useState("");
   const [customHandle, setCustomHandle] = useState("");
   const [utmId, setUtmId] = useState("");
   const [tbzId, setTbzId] = useState("");
@@ -72,33 +73,34 @@ export default function Home() {
   };
 
   // Handle UTM Source changes
-  const handleUtmSourceChange = (e) => {
-    const newSource = e.target.value;
 
-    // If the user selected "Other"
-    if (newSource === "Other") {
-      setIsOtherSource(true);
-      setUtmSource(""); // Clear the displayed source
-      // Clear IDs, since we won't auto-populate in this case
-      setUtmId("");
-      setTbzId("");
-      return;
-    }
+const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const newSource = e.target.value;
 
-    // Otherwise, a standard source
-    setIsOtherSource(false);
-    setUtmSource(newSource);
+  // If the user selected "Other"
+  if (newSource === "Other") {
+    setIsOtherSource(true);
+    setUtmSource(""); // Clear the displayed source
+    // Clear IDs, since we won't auto-populate in this case
+    setUtmId("");
+    setTbzId("");
+    return;
+  }
 
-    // Auto-populate if it's "action_alert"
-    if (newSource === "action_alert") {
-      setUtmId(otgActionAlertID);
-      setTbzId(tbzActionAlertID);
-    } else {
-      // For clarity, clear IDs if changing away from "action_alert"
-      setUtmId("");
-      setTbzId("");
-    }
-  };
+  // Otherwise, a standard source
+  setIsOtherSource(false);
+  setUtmSource(newSource);
+
+  // Auto-populate if it's "action_alert"
+  if (newSource === "action_alert") {
+    setUtmId(otgActionAlertID);
+    setTbzId(tbzActionAlertID);
+  } else {
+    // For clarity, clear IDs if changing away from "action_alert"
+    setUtmId("");
+    setTbzId("");
+  }
+};
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -139,9 +141,12 @@ export default function Home() {
             }}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
           >
-            <option value="DonateWildlife">DonateWildlife</option>
-            <option value="DonateWilderness">DonateWilderness</option>
+            <option value="">Select a handle</option>{" "}
+            {/* Ensure the placeholder is selectable */}
+            <option value="Donate">Donate</option>
             <option value="DonateClimate">DonateClimate</option>
+            <option value="DonateWilderness">DonateWilderness</option>
+            <option value="DonateWildlife">DonateWildlife</option>
             <option value="EndangeredForests">EndangeredForests</option>
             <option value="Other">Other</option>
           </select>
