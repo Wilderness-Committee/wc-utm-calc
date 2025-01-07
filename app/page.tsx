@@ -141,8 +141,9 @@ const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
             }}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
           >
-            <option value="">Select a handle</option>{" "}
-            {/* Ensure the placeholder is selectable */}
+            <option value="" disabled hidden>
+              Select a handle
+            </option>
             <option value="Donate">Donate</option>
             <option value="DonateClimate">DonateClimate</option>
             <option value="DonateWilderness">DonateWilderness</option>
