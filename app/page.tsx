@@ -24,6 +24,8 @@ export default function Home() {
   const [utmTerm, setUtmTerm] = useState("");
   const [utmContent, setUtmContent] = useState("");
   const [generatedUrl, setGeneratedUrl] = useState("");
+  const [customCampaign, setCustomCampaign] = useState("");
+  const [isOtherCampaign, setIsOtherCampaign] = useState(false);
   const [isOtherHandle, setIsOtherHandle] = useState(false);
   const [isOtherSource, setIsOtherSource] = useState(false);
   const [isManualMedium, setIsManualMedium] = useState(false);
@@ -39,23 +41,31 @@ export default function Home() {
   const handles = config?.options?.handle || [];
   const sources = config?.options?.source || [];
   const mediums = config?.options?.medium || [];
+  const campaigns = config?.options?.campaign || [];
+
+  const effectiveCampaign = isOtherCampaign ? customCampaign : utmCampaign;
 
   const isFormValid = useMemo(() => {
     const hasValidHandle = isOtherHandle
       ? customHandle.trim() !== ""
       : baseUrlHandle.trim() !== "";
+    const hasValidCampaign = isOtherCampaign
+      ? customCampaign.trim() !== ""
+      : utmCampaign.trim() !== "";
     return (
       hasValidHandle &&
+      hasValidCampaign &&
       utmId.trim() !== "" &&
       tbzId.trim() !== "" &&
       utmSource.trim() !== "" &&
-      utmMedium.trim() !== "" &&
-      utmCampaign.trim() !== ""
+      utmMedium.trim() !== ""
     );
   }, [
     baseUrlHandle,
     customHandle,
     isOtherHandle,
+    customCampaign,
+    isOtherCampaign,
     utmId,
     tbzId,
     utmSource,
@@ -63,7 +73,28 @@ export default function Home() {
     utmCampaign,
   ]);
 
-  const generateUtmUrl = () => {
+  const generateUtmUrl = async () => {
+    const campaign = effectiveCampaign.trim();
+
+    // Save-on-create: if the user typed a new campaign, persist it to the
+    // shared dropdown (idempotent server-side) and refresh the config.
+    if (isOtherCampaign && campaign) {
+      try {
+        await fetch("/api/campaigns", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: campaign }),
+        });
+        const fresh = await fetch("/api/config").then((r) => r.json());
+        setConfig(fresh);
+        setIsOtherCampaign(false);
+        setCustomCampaign("");
+        setUtmCampaign(campaign);
+      } catch {
+        // Non-fatal: still generate the URL even if the save failed.
+      }
+    }
+
     const baseUrl = `https://www.wildernesscommittee.org/${
       isOtherHandle ? customHandle : baseUrlHandle
     }`;
@@ -72,7 +103,7 @@ export default function Home() {
     if (tbzId) url.searchParams.append("tbz_id", tbzId);
     if (utmSource) url.searchParams.append("utm_source", utmSource);
     if (utmMedium) url.searchParams.append("utm_medium", utmMedium);
-    if (utmCampaign) url.searchParams.append("utm_campaign", utmCampaign);
+    if (campaign) url.searchParams.append("utm_campaign", campaign);
     if (utmTerm) url.searchParams.append("utm_term", utmTerm);
     if (utmContent) url.searchParams.append("utm_content", utmContent);
     setGeneratedUrl(url.toString());
@@ -111,7 +142,10 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="w-full max-w-2xl flex justify-end">
+      <div className="w-full max-w-2xl flex justify-end gap-4 items-center">
+        <a href="/admin" className="text-sm text-indigo-400 hover:underline">
+          Admin
+        </a>
         <button onClick={logout} className="text-sm text-gray-400 hover:text-white">
           Log out
         </button>
@@ -126,14 +160,38 @@ export default function Home() {
             UTM Campaign Name <span className="text-red-500">*</span>
             <Tooltip text={tip("utm_campaign")} />
           </label>
-          <input
-            type="text"
-            value={utmCampaign}
-            onChange={(e) => setUtmCampaign(e.target.value)}
-            placeholder="spotted_owl, say_no_to_fracking"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
-            required
-          />
+          <select
+            value={isOtherCampaign ? "Other" : utmCampaign}
+            onChange={(e) => {
+              if (e.target.value === "Other") {
+                setIsOtherCampaign(true);
+                setUtmCampaign("");
+              } else {
+                setIsOtherCampaign(false);
+                setUtmCampaign(e.target.value);
+              }
+            }}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
+          >
+            <option value="" disabled hidden>
+              Select a campaign
+            </option>
+            {campaigns.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+            <option value="Other">Create new…</option>
+          </select>
+          {isOtherCampaign && (
+            <input
+              type="text"
+              value={customCampaign}
+              onChange={(e) => setCustomCampaign(e.target.value)}
+              placeholder="spotted_owl, say_no_to_fracking"
+              className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
+            />
+          )}
         </div>
 
         {/* URL Handle */}

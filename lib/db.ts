@@ -50,6 +50,20 @@ function migrate(d: Database.Database) {
       tbz_id TEXT NOT NULL DEFAULT ''
     );
   `);
+
+  // Track how/when an option was created so the admin panel can surface
+  // entries that users self-created via "create new" on the main form.
+  const cols = d
+    .prepare("PRAGMA table_info(dropdown_options)")
+    .all() as { name: string }[];
+  if (!cols.some((c) => c.name === "created_via")) {
+    d.exec(
+      "ALTER TABLE dropdown_options ADD COLUMN created_via TEXT NOT NULL DEFAULT 'admin'"
+    );
+  }
+  if (!cols.some((c) => c.name === "created_at")) {
+    d.exec("ALTER TABLE dropdown_options ADD COLUMN created_at TEXT");
+  }
 }
 
 function seedIfEmpty(d: Database.Database) {

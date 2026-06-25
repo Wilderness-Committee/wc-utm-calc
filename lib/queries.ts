@@ -1,6 +1,14 @@
 import db from "@/lib/db";
 
-export type Option = { id: number; field: string; label: string; value: string; sort_order: number };
+export type Option = {
+  id: number;
+  field: string;
+  label: string;
+  value: string;
+  sort_order: number;
+  created_via: string;
+  created_at: string | null;
+};
 export type Tooltip = { field: string; text: string };
 export type CampaignId = { source_value: string; otg_id: string; tbz_id: string };
 
@@ -35,20 +43,43 @@ export function getConfig(): Config {
 
 export function listOptions(): Option[] {
   return db
-    .prepare("SELECT id, field, label, value, sort_order FROM dropdown_options ORDER BY field, sort_order, id")
+    .prepare(
+      "SELECT id, field, label, value, sort_order, created_via, created_at FROM dropdown_options ORDER BY field, sort_order, id"
+    )
     .all() as Option[];
 }
 
-export function addOption(field: string, label: string, value: string): Option {
+export function addOption(
+  field: string,
+  label: string,
+  value: string,
+  createdVia: "admin" | "user" = "admin"
+): Option {
   const max = db
     .prepare("SELECT COALESCE(MAX(sort_order), -1) AS m FROM dropdown_options WHERE field = ?")
     .get(field) as { m: number };
   const info = db
-    .prepare("INSERT INTO dropdown_options (field, label, value, sort_order) VALUES (?, ?, ?, ?)")
-    .run(field, label, value, max.m + 1);
+    .prepare(
+      "INSERT INTO dropdown_options (field, label, value, sort_order, created_via, created_at) VALUES (?, ?, ?, ?, ?, ?)"
+    )
+    .run(field, label, value, max.m + 1, createdVia, new Date().toISOString());
   return db
-    .prepare("SELECT id, field, label, value, sort_order FROM dropdown_options WHERE id = ?")
+    .prepare(
+      "SELECT id, field, label, value, sort_order, created_via, created_at FROM dropdown_options WHERE id = ?"
+    )
     .get(info.lastInsertRowid) as Option;
+}
+
+// Save-on-create from the main form. Idempotent: returns the existing option
+// if a campaign with the same value already exists, so users can't create dupes.
+export function addUserCampaign(name: string): Option {
+  const existing = db
+    .prepare(
+      "SELECT id, field, label, value, sort_order, created_via, created_at FROM dropdown_options WHERE field = 'campaign' AND value = ?"
+    )
+    .get(name) as Option | undefined;
+  if (existing) return existing;
+  return addOption("campaign", name, name, "user");
 }
 
 export function deleteOption(id: number): void {

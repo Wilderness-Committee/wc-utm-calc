@@ -2,14 +2,23 @@
 
 import { useEffect, useState } from "react";
 
-type Option = { id: number; field: string; label: string; value: string; sort_order: number };
+type Option = {
+  id: number;
+  field: string;
+  label: string;
+  value: string;
+  sort_order: number;
+  created_via: string;
+  created_at: string | null;
+};
 
 const FIELD_LABELS: Record<string, string> = {
   handle: "URL Handle",
   source: "UTM Source",
   medium: "UTM Medium",
+  campaign: "UTM Campaign Name",
 };
-const OPTION_FIELDS = ["handle", "source", "medium"];
+const OPTION_FIELDS = ["campaign", "handle", "source", "medium"];
 
 const TOOLTIP_FIELDS: { field: string; label: string }[] = [
   { field: "utm_campaign", label: "UTM Campaign Name" },
@@ -114,6 +123,12 @@ export default function AdminPanel() {
         </div>
       </div>
 
+      {/* Recently added by users */}
+      <RecentlyAdded
+        options={options.filter((o) => o.created_via === "user")}
+        onDelete={deleteOption}
+      />
+
       {/* Dropdown options */}
       <section className="mb-10">
         <h2 className="text-xl font-semibold mb-4">Dropdown Options</h2>
@@ -163,6 +178,54 @@ export default function AdminPanel() {
   );
 }
 
+function RecentlyAdded({
+  options,
+  onDelete,
+}: {
+  options: Option[];
+  onDelete: (id: number) => void;
+}) {
+  if (options.length === 0) return null;
+
+  const fmt = (iso: string | null) =>
+    iso ? new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "";
+
+  const recent = [...options].sort((a, b) =>
+    (b.created_at || "").localeCompare(a.created_at || "")
+  );
+
+  return (
+    <section className="mb-10 border border-amber-500/40 bg-amber-500/10 rounded-md p-4">
+      <h2 className="text-lg font-semibold mb-1 text-amber-300">
+        Recently added by users
+      </h2>
+      <p className="text-sm text-gray-300 mb-3">
+        These dropdown values were created from the generator&apos;s &ldquo;Create
+        new&rdquo; option. Remove any that shouldn&apos;t stay in the list.
+      </p>
+      <ul className="space-y-1">
+        {recent.map((o) => (
+          <li key={o.id} className="flex justify-between items-center text-sm">
+            <span>
+              <span className="text-gray-400">{FIELD_LABELS[o.field] || o.field}:</span>{" "}
+              {o.label} <span className="text-gray-500">({o.value})</span>
+              {o.created_at && (
+                <span className="ml-2 text-xs text-gray-500">{fmt(o.created_at)}</span>
+              )}
+            </span>
+            <button
+              onClick={() => onDelete(o.id)}
+              className="text-red-400 hover:text-red-300 text-xs"
+            >
+              Remove
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function OptionGroup({
   field,
   label,
@@ -187,6 +250,9 @@ function OptionGroup({
           <li key={o.id} className="flex justify-between items-center text-sm">
             <span>
               {o.label} <span className="text-gray-500">({o.value})</span>
+              {o.created_via === "user" && (
+                <span className="ml-2 text-xs text-amber-400">user-added</span>
+              )}
             </span>
             <button
               onClick={() => onDelete(o.id)}
