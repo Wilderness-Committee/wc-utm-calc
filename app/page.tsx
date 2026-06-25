@@ -1,9 +1,19 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import React from "react";
+import Tooltip from "@/app/components/Tooltip";
+
+type Opt = { label: string; value: string };
+type Config = {
+  options: Record<string, Opt[]>;
+  tooltips: Record<string, string>;
+  campaignIds: Record<string, { otg_id: string; tbz_id: string }>;
+};
 
 export default function Home() {
+  const [config, setConfig] = useState<Config | null>(null);
+
   const [baseUrlHandle, setBaseUrlHandle] = useState("");
   const [customHandle, setCustomHandle] = useState("");
   const [utmId, setUtmId] = useState("");
@@ -18,18 +28,22 @@ export default function Home() {
   const [isOtherSource, setIsOtherSource] = useState(false);
   const [isManualMedium, setIsManualMedium] = useState(false);
 
-  // The auto-populate IDs for Action Alert
-  const otgActionAlertID = "701Am0000009AAGIA2";
-  const tbzActionAlertID = "701OL000002fbgqYAA";
+  useEffect(() => {
+    fetch("/api/config")
+      .then((r) => r.json())
+      .then(setConfig)
+      .catch(() => setConfig({ options: {}, tooltips: {}, campaignIds: {} }));
+  }, []);
 
-  // Derived state for form validation
+  const tip = (field: string) => config?.tooltips?.[field] || "";
+  const handles = config?.options?.handle || [];
+  const sources = config?.options?.source || [];
+  const mediums = config?.options?.medium || [];
+
   const isFormValid = useMemo(() => {
-    // Check if URL Handle is valid
     const hasValidHandle = isOtherHandle
       ? customHandle.trim() !== ""
       : baseUrlHandle.trim() !== "";
-
-    // Required: utmId, tbzId, utmSource, utmMedium, utmCampaign
     return (
       hasValidHandle &&
       utmId.trim() !== "" &&
@@ -54,7 +68,6 @@ export default function Home() {
       isOtherHandle ? customHandle : baseUrlHandle
     }`;
     const url = new URL(baseUrl);
-
     if (utmId) url.searchParams.append("utm_id", utmId);
     if (tbzId) url.searchParams.append("tbz_id", tbzId);
     if (utmSource) url.searchParams.append("utm_source", utmSource);
@@ -62,48 +75,47 @@ export default function Home() {
     if (utmCampaign) url.searchParams.append("utm_campaign", utmCampaign);
     if (utmTerm) url.searchParams.append("utm_term", utmTerm);
     if (utmContent) url.searchParams.append("utm_content", utmContent);
-
     setGeneratedUrl(url.toString());
   };
 
   const copyToClipboard = () => {
-    if (generatedUrl) {
-      navigator.clipboard.writeText(generatedUrl);
+    if (generatedUrl) navigator.clipboard.writeText(generatedUrl);
+  };
+
+  const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newSource = e.target.value;
+    if (newSource === "Other") {
+      setIsOtherSource(true);
+      setUtmSource("");
+      setUtmId("");
+      setTbzId("");
+      return;
+    }
+    setIsOtherSource(false);
+    setUtmSource(newSource);
+
+    const auto = config?.campaignIds?.[newSource];
+    if (auto) {
+      setUtmId(auto.otg_id);
+      setTbzId(auto.tbz_id);
+    } else {
+      setUtmId("");
+      setTbzId("");
     }
   };
 
-  // Handle UTM Source changes
-
-const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  const newSource = e.target.value;
-
-  // If the user selected "Other"
-  if (newSource === "Other") {
-    setIsOtherSource(true);
-    setUtmSource(""); // Clear the displayed source
-    // Clear IDs, since we won't auto-populate in this case
-    setUtmId("");
-    setTbzId("");
-    return;
-  }
-
-  // Otherwise, a standard source
-  setIsOtherSource(false);
-  setUtmSource(newSource);
-
-  // Auto-populate if it's "action_alert"
-  if (newSource === "action_alert") {
-    setUtmId(otgActionAlertID);
-    setTbzId(tbzActionAlertID);
-  } else {
-    // For clarity, clear IDs if changing away from "action_alert"
-    setUtmId("");
-    setTbzId("");
-  }
-};
+  const logout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/login";
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <div className="w-full max-w-2xl flex justify-end">
+        <button onClick={logout} className="text-sm text-gray-400 hover:text-white">
+          Log out
+        </button>
+      </div>
       <h1 className="text-4xl font-bold mb-8">
         Wilderness Committee UTM Link Generator
       </h1>
@@ -112,6 +124,7 @@ const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
             UTM Campaign Name <span className="text-red-500">*</span>
+            <Tooltip text={tip("utm_campaign")} />
           </label>
           <input
             type="text"
@@ -127,6 +140,7 @@ const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
             URL Handle <span className="text-red-500">*</span>
+            <Tooltip text={tip("handle")} />
           </label>
           <select
             value={isOtherHandle ? "Other" : baseUrlHandle}
@@ -144,11 +158,11 @@ const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
             <option value="" disabled hidden>
               Select a handle
             </option>
-            <option value="Donate">Donate</option>
-            <option value="DonateClimate">DonateClimate</option>
-            <option value="DonateWilderness">DonateWilderness</option>
-            <option value="DonateWildlife">DonateWildlife</option>
-            <option value="EndangeredForests">EndangeredForests</option>
+            {handles.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
             <option value="Other">Other</option>
           </select>
           {isOtherHandle && (
@@ -166,6 +180,7 @@ const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
             UTM Source <span className="text-red-500">*</span>
+            <Tooltip text={tip("source")} />
           </label>
           <select
             value={isOtherSource ? "Other" : utmSource}
@@ -175,18 +190,11 @@ const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
             <option value="" disabled hidden>
               Select a source
             </option>
-            <option value="action_alert">Action Alert</option>
-            <option value="donor_comms">Donor Comms</option>
-            <option value="impact_report">Impact Report</option>
-            <option value="end_of_year">End Of Year</option>
-            <option value="fracking_ej">Fracking Engagement Journey</option>
-            <option value="old_growth_ej">Old Growth Engagement Journey</option>
-            <option value="action_welcome_ej">
-              Action Welcome Engagement Journey
-            </option>
-            <option value="donor_welcome_ej">
-              Donor Welcome Engagement Journey
-            </option>
+            {sources.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
             <option value="Other">Other</option>
           </select>
           {isOtherSource && (
@@ -204,12 +212,13 @@ const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
             UTM Medium <span className="text-red-500">*</span>
+            <Tooltip text={tip("medium")} />
           </label>
           <select
             value={isManualMedium ? "" : utmMedium}
             onChange={(e) => {
               const newValue = e.target.value;
-              if (newValue === "other socials" || newValue === "other") {
+              if (newValue === "other") {
                 setIsManualMedium(true);
                 setUtmMedium("");
               } else {
@@ -222,12 +231,11 @@ const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
             <option value="" disabled hidden>
               Select a medium
             </option>
-            <option value="email">Email</option>
-            <option value="journey">Journey</option>
-            <option value="blog">Blog</option>
-            <option value="facebook">Facebook</option>
-            <option value="instagram">Instagram</option>
-            <option value="other socials">Other Socials</option>
+            {mediums.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
             <option value="other">Other</option>
           </select>
           {isManualMedium && (
@@ -245,6 +253,7 @@ const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
             OTG Campaign ID <span className="text-red-500">*</span>
+            <Tooltip text={tip("otg_id")} />
           </label>
           <input
             type="text"
@@ -260,6 +269,7 @@ const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
             TBZ Campaign ID <span className="text-red-500">*</span>
+            <Tooltip text={tip("tbz_id")} />
           </label>
           <input
             type="text"
@@ -276,6 +286,7 @@ const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
           <label className="block text-sm font-medium text-white-700">
             UTM Term
             <span className="text-gray-500 text-xs ml-1">(optional)</span>
+            <Tooltip text={tip("utm_term")} />
           </label>
           <input
             type="text"
@@ -291,6 +302,7 @@ const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
           <label className="block text-sm font-medium text-white-700">
             UTM Content
             <span className="text-gray-500 text-xs ml-1">(optional)</span>
+            <Tooltip text={tip("utm_content")} />
           </label>
           <input
             type="text"
@@ -317,9 +329,7 @@ const handleUtmSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         {/* Generated URL & Copy Button */}
         {generatedUrl && (
           <div className="mt-6 p-4 bg-gray-100 rounded-md">
-            <h2 className="text-lg font-medium mb-2 text-black">
-              Generated URL
-            </h2>
+            <h2 className="text-lg font-medium mb-2 text-black">Generated URL</h2>
             <p className="break-all text-blue-600">{generatedUrl}</p>
             <div className="flex justify-center items-center">
               <button
