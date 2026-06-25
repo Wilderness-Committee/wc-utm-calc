@@ -1,63 +1,50 @@
 # Wilderness Committee UTM Link Generator
 
-This is a simple UTM Link Generator web app built with Next.js and Tailwind CSS. The app allows you to generate UTM links easily by filling out a form with relevant campaign parameters.
-
-## Use UTM Link Generator
-
-You can use the UTM Link Generator without installing by visiting [this link](https://wilderness-committee.github.io/wc-utm-calc/).
+A UTM Link Generator web app built with Next.js and Tailwind CSS, backed by SQLite. Team members generate UTM links from a form whose dropdown options, field tooltips, and per-source auto-fill campaign IDs are all managed through an admin panel.
 
 ## Features
 
-- Select protocol (`http` or `https`).
-- Input fields for base URL and UTM parameters such as `utm_source`, `utm_medium`, `utm_campaign`, and more.
-- Optionally add `OTG Campaign ID` and `TBZ Campaign ID`.
-- Generates the UTM link and displays it for copying and sharing.
+- Form for UTM parameters (`utm_source`, `utm_medium`, `utm_campaign`, etc.) plus OTG/TBZ Campaign IDs.
+- Dropdown options for URL Handle, UTM Source, and UTM Medium are stored in SQLite and editable in the admin panel.
+- Per-field tooltips, editable in the admin panel.
+- Per-source auto-fill: selecting a UTM Source can auto-populate the OTG/TBZ Campaign IDs.
+- Two-tier auth: a site-wide password for the generator and a separate admin password for the `/admin` panel.
 
-## Screenshot
+## Routes
 
-![Wilderness Committee UTM Link Generator](./public/screenshot.png)
+- `/` — the generator (requires site password)
+- `/admin` — admin panel (requires admin password)
+- `/login`, `/admin/login` — password gates
+
+## Environment variables
+
+| Variable          | Purpose                                                        |
+| ----------------- | -------------------------------------------------------------- |
+| `SESSION_SECRET`  | Secret used to sign auth cookies. Set to a long random string. |
+| `SITE_PASSWORD`   | Password for the main generator page.                          |
+| `ADMIN_PASSWORD`  | Password for the `/admin` panel.                               |
+| `DATABASE_PATH`   | Path to the SQLite file. In production point at a mounted volume, e.g. `/data/utm.db`. Defaults to `./data/utm.db`. |
+
+The database is created and seeded automatically on first boot from the previously hardcoded dropdown values and the `action_alert` auto-fill IDs.
 
 ## Getting Started
 
-### Prerequisites
-
-Make sure you have Node.js and npm installed on your machine.
-
-### Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/wilderness-committee/wc-utm-calc.git
-   ```
-
-2. Navigate to the project folder:
-
-   ```bash
-   cd wc-utm-calc
-   ```
-
-3. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-### Running the App
-
-To run the app locally, use:
-
 ```bash
-npm run dev
+npm install
+
+SESSION_SECRET=dev SITE_PASSWORD=site ADMIN_PASSWORD=admin npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) to see the app in your browser.
+Then open [http://localhost:3000](http://localhost:3000).
 
-## Usage
+## Deployment (Railway)
 
-1. Enter the required and optional fields.
-2. Click "Generate UTM Link".
-3. The generated UTM link will appear for you to copy.
+The app builds as a standalone Next.js server via the included `Dockerfile`.
+
+1. Create a Railway project from this repo.
+2. Add a **volume** mounted at `/data`.
+3. Set env vars: `SESSION_SECRET`, `SITE_PASSWORD`, `ADMIN_PASSWORD`, and `DATABASE_PATH=/data/utm.db`.
+4. Deploy. The SQLite DB persists on the volume across redeploys.
 
 ## License
 
