@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
 import Tooltip from "@/app/components/Tooltip";
 
@@ -45,33 +45,8 @@ export default function Home() {
 
   const effectiveCampaign = isOtherCampaign ? customCampaign : utmCampaign;
 
-  const isFormValid = useMemo(() => {
-    const hasValidHandle = isOtherHandle
-      ? customHandle.trim() !== ""
-      : baseUrlHandle.trim() !== "";
-    const hasValidCampaign = isOtherCampaign
-      ? customCampaign.trim() !== ""
-      : utmCampaign.trim() !== "";
-    return (
-      hasValidHandle &&
-      hasValidCampaign &&
-      utmId.trim() !== "" &&
-      tbzId.trim() !== "" &&
-      utmSource.trim() !== "" &&
-      utmMedium.trim() !== ""
-    );
-  }, [
-    baseUrlHandle,
-    customHandle,
-    isOtherHandle,
-    customCampaign,
-    isOtherCampaign,
-    utmId,
-    tbzId,
-    utmSource,
-    utmMedium,
-    utmCampaign,
-  ]);
+  // All fields are optional (per Aimee's request) — the generator can always run.
+  const isFormValid = true;
 
   const generateUtmUrl = async () => {
     const campaign = effectiveCampaign.trim();
@@ -157,7 +132,7 @@ export default function Home() {
         {/* UTM Campaign */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
-            UTM Campaign Name <span className="text-red-500">*</span>
+            UTM Campaign Name
             <Tooltip text={tip("utm_campaign")} />
           </label>
           <select
@@ -197,7 +172,7 @@ export default function Home() {
         {/* URL Handle */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
-            URL Handle <span className="text-red-500">*</span>
+            URL Handle
             <Tooltip text={tip("handle")} />
           </label>
           <select
@@ -237,7 +212,7 @@ export default function Home() {
         {/* UTM Source */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
-            UTM Source <span className="text-red-500">*</span>
+            UTM Source
             <Tooltip text={tip("source")} />
           </label>
           <select
@@ -269,7 +244,7 @@ export default function Home() {
         {/* UTM Medium */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
-            UTM Medium <span className="text-red-500">*</span>
+            UTM Medium
             <Tooltip text={tip("medium")} />
           </label>
           <select
@@ -310,7 +285,7 @@ export default function Home() {
         {/* OTG Campaign ID */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
-            OTG Campaign ID <span className="text-red-500">*</span>
+            OTG Campaign ID
             <Tooltip text={tip("otg_id")} />
           </label>
           <input
@@ -319,14 +294,13 @@ export default function Home() {
             onChange={(e) => setUtmId(e.target.value)}
             placeholder="701OL000009lpgEYAQ"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
-            required
           />
         </div>
 
         {/* TBZ Campaign ID */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
-            TBZ Campaign ID <span className="text-red-500">*</span>
+            TBZ Campaign ID
             <Tooltip text={tip("tbz_id")} />
           </label>
           <input
@@ -335,16 +309,13 @@ export default function Home() {
             onChange={(e) => setTbzId(e.target.value)}
             placeholder="701OL00000Fn1WzYAJ"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black placeholder-gray-500"
-            required
           />
         </div>
 
         {/* UTM Term (Optional) */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
-            UTM Term
-            <span className="text-gray-500 text-xs ml-1">(optional)</span>
-            <Tooltip text={tip("utm_term")} />
+            UTM Term            <Tooltip text={tip("utm_term")} />
           </label>
           <input
             type="text"
@@ -358,9 +329,7 @@ export default function Home() {
         {/* UTM Content (Optional) */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-white-700">
-            UTM Content
-            <span className="text-gray-500 text-xs ml-1">(optional)</span>
-            <Tooltip text={tip("utm_content")} />
+            UTM Content            <Tooltip text={tip("utm_content")} />
           </label>
           <input
             type="text"
